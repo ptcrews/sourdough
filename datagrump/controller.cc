@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 
 #include "controller.hh"
 #include "timestamp.hh"
@@ -14,7 +15,11 @@ Controller::Controller( const bool debug )
 unsigned int Controller::window_size()
 {
   /* Default: fixed window size of 100 outstanding datagrams */
+  char* window_size_str = std::getenv("WINDOW_SIZE");
   unsigned int the_window_size = 50;
+  if (window_size_str) {
+    the_window_size = strtol(window_size_str, NULL, 10);
+  }
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
