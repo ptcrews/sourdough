@@ -43,7 +43,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
   if(after_timeout) {
     
     this->the_window_size = this->the_window_size/2;
-    cerr << "window size halved" << endl;
+    cerr << "window size halved: timeout" << endl;
     if(this->the_window_size == 0) {
       this->the_window_size = 1;
     }
@@ -70,16 +70,16 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   if(sequence_number_acked > this->last_ack_rcvd) { //Received Future ack
     this->ack_counter += 1;
-    this->the_window_size += this->ack_counter/this->the_window_size;
     if(this->ack_counter >= this->the_window_size) {
       this->ack_counter = 0;
+      this->the_window_size += 1;
     }
     this->last_ack_rcvd = sequence_number_acked;
   }
 
   else if(sequence_number_acked <= this->last_ack_rcvd){ //Drop detected
     this->the_window_size = this->the_window_size/2;
-    cerr << "window size halved" << endl;
+    cerr << "window size halved: old ack" << endl;
     if(this->the_window_size == 0) {
       this->the_window_size = 1;
     }
@@ -100,5 +100,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms()
 {
-  return 1000; /* timeout of one second */
+  return 500; /* timeout of one second */
 }
