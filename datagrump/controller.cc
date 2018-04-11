@@ -15,18 +15,18 @@ Controller::Controller( const bool debug )
 unsigned int Controller::window_size()
 {
   /* Default: fixed window size of 100 outstanding datagrams */
-  char* window_size_str = std::getenv("WINDOW_SIZE");
-  unsigned int the_window_size = 50;
-  if (window_size_str) {
-    the_window_size = strtol(window_size_str, NULL, 10);
-  }
+//  char* window_size_str = std::getenv("WINDOW_SIZE");
+//  unsigned int the_window_size = 50;
+//  if (window_size_str) {
+//    the_window_size = strtol(window_size_str, NULL, 10);
+//  }
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
-	 << " window size is " << the_window_size << endl;
+	 << " window size is " << this->the_window_size << endl;
   }
 
-  return the_window_size;
+  return this->the_window_size;
 }
 
 /* A datagram was sent */
@@ -38,6 +38,8 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 				    /* datagram was sent because of a timeout */ )
 {
   /* Default: take no action */
+
+  last_seq_sent = sequence_number;
 
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
@@ -56,6 +58,24 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   /* Default: take no action */
+
+  if(sequence_number_acked > this->last_ack_rcvd) { //Received Future ack
+    this->ack_counter += 1;
+    this->the_window_size += this->ack_counter/this->the_window_size;
+    if(this->ack_counter >= this->the_window_size) {
+      this->ack_counter = 0;
+    }
+  }
+
+  else if(sequence_number_acked <= this->last_ack_rcvd){ //Drop detected
+    this->the_window_size = this->the_window_size/2;
+    if(this->the_window_size == 0) {
+      this->the_window_size = 1;
+    }
+    this->ack_counter = 0;
+  }
+  
+  this->last_ack_rcvd = sequence_number_acked;
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
