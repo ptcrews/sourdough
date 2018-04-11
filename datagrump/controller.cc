@@ -8,7 +8,7 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_( debug )
+  : debug_( debug || false )
 {}
 
 /* Get current window size, in datagrams */
@@ -40,6 +40,15 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
   /* Default: take no action */
 
   last_seq_sent = sequence_number;
+  if(after_timeout) {
+    
+    this->the_window_size = this->the_window_size/2;
+    cerr << "window size halved" << endl;
+    if(this->the_window_size == 0) {
+      this->the_window_size = 1;
+    }
+    this->ack_counter = 0;
+  }
 
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
@@ -65,17 +74,18 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     if(this->ack_counter >= this->the_window_size) {
       this->ack_counter = 0;
     }
+    this->last_ack_rcvd = sequence_number_acked;
   }
 
   else if(sequence_number_acked <= this->last_ack_rcvd){ //Drop detected
     this->the_window_size = this->the_window_size/2;
+    cerr << "window size halved" << endl;
     if(this->the_window_size == 0) {
       this->the_window_size = 1;
     }
     this->ack_counter = 0;
   }
   
-  this->last_ack_rcvd = sequence_number_acked;
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
