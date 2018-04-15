@@ -100,11 +100,13 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
 
   if(rtt >= min_rtt + 2*rtt_delta) {
-    this->the_window_size -= 0.1;
+    if (this->the_window_size >= 1) {
+      this->the_window_size -= 0.1;
+    }
   }
 
   if(rtt < min_rtt + rtt_delta) {
-    this->the_window_size += 0.1;
+    this->the_window_size += 0.3;
   }
 
   if ( debug_ ) {
