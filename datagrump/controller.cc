@@ -90,6 +90,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 <<<<<<< Updated upstream
 */  
   const uint64_t rtt = timestamp_ack_received - send_timestamp_acked;
+  cout << "RTT: " << rtt << "MinRTT: " << min_rtt << endl;
   if(rtt < min_rtt) {
     min_rtt = rtt;
   }

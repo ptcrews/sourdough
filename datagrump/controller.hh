@@ -9,7 +9,7 @@ class Controller
 {
 private:
   bool debug_; /* Enables debugging output */
-  unsigned int the_window_size = 100;
+  unsigned int the_window_size = 1;
 
   // Estimate minimal RTT value
   uint64_t min_rtt = 5000;
