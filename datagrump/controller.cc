@@ -42,16 +42,16 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 
   last_seq_sent = sequence_number;
 
-  /*
-  if(after_timeout) {
+  if(after_timeout && (send_timestamp - last_timeout) > 200) {
 
+    last_timeout = send_timestamp;
     this->the_window_size = this->the_window_size/2;
     cerr << "window size halved: timeout" << endl;
     if(this->the_window_size == 0) {
       this->the_window_size = 1;
     }
     this->ack_counter = 0;
-  }*/
+  }
 
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
@@ -103,7 +103,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
         this->the_window_size = this->estimated_window_size;
     } else {
 	this->the_window_size -= 0.5;
-        if (this->the_window_size >= 1) {
+        if (rtt >= min_rtt + 2*rtt_delta) {
           this->the_window_size -= 0.5;
         }
     }
@@ -127,11 +127,11 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   // Good window size
   if(rtt < min_rtt + rtt_delta/4) {
-    this->the_window_size = max(this->the_window_size + 0.4, this->estimated_window_size);
+    this->the_window_size = max(this->the_window_size + 1.0, this->estimated_window_size);
   } else if (rtt < min_rtt + rtt_delta/2) {
-    this->the_window_size = max(this->the_window_size + 0.2, this->estimated_window_size);
+    this->the_window_size = max(this->the_window_size + 0.5, this->estimated_window_size);
   } else if (rtt < min_rtt + rtt_delta) {
-    this->the_window_size = max(this->the_window_size + 0.1, this->estimated_window_size);
+    this->the_window_size = max(this->the_window_size + 0.2, this->estimated_window_size);
   }
 
 
@@ -154,5 +154,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 unsigned int Controller::timeout_ms()
 {
   //return 1000; /* timeout of one second */
-  return 3*min_rtt;
+  return 2*min_rtt;
 }
