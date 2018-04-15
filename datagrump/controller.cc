@@ -121,8 +121,20 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 */
 
 
+  // Good window size
   if(rtt < min_rtt + rtt_delta) {
-    this->the_window_size +=  (pow((min_rtt + rtt_delta - rtt), 2) / (pow(rtt_delta, 2))) * 0.5;
+    if (congestion) {
+      congestion = false;
+    }
+    this->last_good_window = max(this->the_window_size, this->last_good_window);
+    if(this->the_window_size < this->last_good_window - 10) {
+      this->the_window_size += (this->last_good_window - this->the_window_size)/2;
+    } else {
+      this->the_window_size += 0.1;
+    }
+  } else {
+    if (!congestion) this->last_good_window = this->the_window_size;
+    congestion = true;
   }
 
 

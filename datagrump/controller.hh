@@ -10,10 +10,12 @@ class Controller
 private:
   bool debug_; /* Enables debugging output */
   double the_window_size = 30;
+  double last_good_window = 30;
+  bool congestion = false;
 
   // Estimate minimal RTT value
   uint64_t min_rtt = 5000;
-  uint64_t rtt_delta = 19;
+  uint64_t rtt_delta = 20;
 
   unsigned int last_seq_sent = 0;
   unsigned int last_ack_rcvd = 0;
