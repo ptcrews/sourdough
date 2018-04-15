@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <cmath>
 
 #include "controller.hh"
 #include "timestamp.hh"
@@ -104,13 +105,29 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       this->the_window_size -= 0.1;
     }
   }
-
+/*
   if(rtt < min_rtt + rtt_delta) {
-    this->the_window_size += 0.05;
+    this->the_window_size += 0.01;
   }
   
   if(rtt < min_rtt + rtt_delta/2) {
-    this->the_window_size += 0.25;
+    this->the_window_size += 0.2;
+  }
+
+
+  else if(rtt < min_rtt + rtt_delta/4) {
+    this->the_window_size += 0.4;
+  }
+*/
+
+
+  if(rtt < min_rtt + rtt_delta) {
+    this->the_window_size +=  (pow((min_rtt + rtt_delta - rtt), 2) / (pow(rtt_delta, 2))) * 0.5;
+  }
+
+
+  if(this->the_window_size < 1) { //to prevent window size of 0
+    this->the_window_size = 1;
   }
 
   if ( debug_ ) {
