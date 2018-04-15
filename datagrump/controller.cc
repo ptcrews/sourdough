@@ -92,19 +92,23 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 */  
   const uint64_t rtt = timestamp_ack_received - send_timestamp_acked;
   cout << "RTT: " << rtt << "MinRTT: " << min_rtt << endl;
+  double alpha = 0.2;
+  this->estimated_window_size = alpha * this->the_window_size + (1-alpha)*this->estimated_window_size;
   if(rtt < min_rtt) {
     min_rtt = rtt;
   }
 
   if(rtt >= min_rtt + rtt_delta) {
-    this->the_window_size -= 0.5;
-  }
-
-  if(rtt >= min_rtt + 2*rtt_delta) {
-    if (this->the_window_size >= 1) {
-      this->the_window_size -= 0.5;
+    if (this->the_window_size > this->estimated_window_size) {
+        this->the_window_size = this->estimated_window_size;
+    } else {
+	this->the_window_size -= 0.5;
+        if (this->the_window_size >= 1) {
+          this->the_window_size -= 0.5;
+        }
     }
   }
+
 /*
   if(rtt < min_rtt + rtt_delta) {
     this->the_window_size += 0.01;
@@ -122,19 +126,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
 
   // Good window size
-  if(rtt < min_rtt + rtt_delta) {
-    if (congestion) {
-      congestion = false;
-    }
-    if(this->the_window_size < this->last_good_window-1) {
-      this->the_window_size += (this->last_good_window - this->the_window_size)/4;
-    } else {
-      this->the_window_size += 0.1;
-    }
-    this->last_good_window = max(this->the_window_size, this->last_good_window);
-  } else {
-    if (!congestion) this->last_good_window = this->the_window_size;
-    congestion = true;
+  if(rtt < min_rtt + rtt_delta/4) {
+    this->the_window_size = max(this->the_window_size + 0.4, this->estimated_window_size);
+  } else if (rtt < min_rtt + rtt_delta/2) {
+    this->the_window_size = max(this->the_window_size + 0.2, this->estimated_window_size);
+  } else if (rtt < min_rtt + rtt_delta) {
+    this->the_window_size = max(this->the_window_size + 0.1, this->estimated_window_size);
   }
 
 
