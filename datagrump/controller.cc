@@ -102,10 +102,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     if (this->the_window_size > this->estimated_window_size) {
         this->the_window_size = this->estimated_window_size;
     } else {
-	this->the_window_size -= 0.5;
-        if (rtt >= min_rtt + 2*rtt_delta) {
-          this->the_window_size -= 0.5;
-        }
+        double adjustment = (pow(rtt - min_rtt + rtt_delta, 2) / pow(rtt_delta, 2))*0.01;
+	this->the_window_size -= adjustment;
     }
   }
 
@@ -126,12 +124,9 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
 
   // Good window size
-  if(rtt < min_rtt + rtt_delta/4) {
-    this->the_window_size = max(this->the_window_size + 1.0, this->estimated_window_size);
-  } else if (rtt < min_rtt + rtt_delta/2) {
-    this->the_window_size = max(this->the_window_size + 0.5, this->estimated_window_size);
-  } else if (rtt < min_rtt + rtt_delta) {
-    this->the_window_size = max(this->the_window_size + 0.2, this->estimated_window_size);
+  if(rtt < min_rtt + rtt_delta) {
+    double adjustment = (pow((min_rtt + rtt_delta - rtt), 2) / (pow(rtt_delta, 2)))*0.5;
+    this->the_window_size = max(this->the_window_size + adjustment, this->estimated_window_size);
   }
 
 
