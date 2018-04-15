@@ -26,7 +26,7 @@ unsigned int Controller::window_size()
 	 << " window size is " << this->the_window_size << endl;
   }
 
-  return this->the_window_size;
+  return (int)(this->the_window_size);
 }
 
 /* A datagram was sent */
@@ -96,15 +96,15 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
 
   if(rtt >= min_rtt + rtt_delta) {
-    this->the_window_size -= 1;
+    this->the_window_size -= 0.1;
   }
 
   if(rtt >= min_rtt + 2*rtt_delta) {
-    this->the_window_size -= 3;
+    this->the_window_size -= 0.1;
   }
 
   if(rtt < min_rtt + rtt_delta) {
-    this->the_window_size += 1;
+    this->the_window_size += 0.1;
   }
 
   if ( debug_ ) {
@@ -120,5 +120,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms()
 {
-  return 1000; /* timeout of one second */
+  //return 1000; /* timeout of one second */
+  return 4*min_rtt;
 }
