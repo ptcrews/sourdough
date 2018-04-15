@@ -13,7 +13,7 @@ private:
 
   // Estimate minimal RTT value
   uint64_t min_rtt = 5000;
-  uint64_t rtt_delta = 19;
+  uint64_t rtt_delta = 22;
 
   unsigned int last_seq_sent = 0;
   unsigned int last_ack_rcvd = 0;

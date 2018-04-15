@@ -95,7 +95,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   if(rtt < min_rtt) {
     min_rtt = rtt;
   }
-
+/* old method for decreasing window size (static)
   if(rtt >= min_rtt + rtt_delta) {
     this->the_window_size -= 0.1;
   }
@@ -105,6 +105,13 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       this->the_window_size -= 0.1;
     }
   }
+*/
+//new method for decreasing window size (dynamic)
+
+  if(rtt >= min_rtt + rtt_delta) {
+    this->the_window_size -= (pow(rtt - min_rtt + rtt_delta, 2)/pow(rtt_delta,2)) * 0.005;
+  }
+
 /*
   if(rtt < min_rtt + rtt_delta) {
     this->the_window_size += 0.01;
