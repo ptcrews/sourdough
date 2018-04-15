@@ -8,8 +8,8 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_( debug || true )
-{}
+  : debug_( debug || false )
+{ }
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size()
@@ -43,7 +43,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 
   /*
   if(after_timeout) {
-    
+
     this->the_window_size = this->the_window_size/2;
     cerr << "window size halved: timeout" << endl;
     if(this->the_window_size == 0) {
@@ -54,7 +54,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
-	 << " sent datagram " << sequence_number << " (timeout = " << after_timeout << ")\n";
+      << " sent datagram " << sequence_number << " (timeout = " << after_timeout << ")\n";
   }
 }
 
@@ -87,18 +87,23 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     }
     this->ack_counter = 0;
   }
+<<<<<<< Updated upstream
 */  
-
-  if(timestamp_ack_received - send_timestamp_acked < 150) {
-      if(this->the_window_size < 125) {
-        this->the_window_size += 1;
-      }
+  const uint64_t rtt = timestamp_ack_received - send_timestamp_acked;
+  if(rtt < min_rtt) {
+    min_rtt = rtt;
   }
-  
-  if(timestamp_ack_received - send_timestamp_acked > 400) {
-      if(this->the_window_size > 30) {
-        this->the_window_size -= 1;
-      }
+
+  if(rtt >= min_rtt + rtt_delta) {
+    this->the_window_size -= 1;
+  }
+
+  if(rtt >= min_rtt + 2*rtt_delta) {
+    this->the_window_size -= 3;
+  }
+
+  if(rtt < min_rtt + rtt_delta) {
+    this->the_window_size += 1;
   }
 
   if ( debug_ ) {
