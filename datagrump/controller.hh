@@ -9,7 +9,7 @@ class Controller
 {
 private:
   bool debug_; /* Enables debugging output */
-  unsigned int the_window_size = 0;
+  unsigned int the_window_size = 100;
   unsigned int last_seq_sent = 0;
   unsigned int last_ack_rcvd = 0;
   unsigned int ack_counter = 0;

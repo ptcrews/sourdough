@@ -8,7 +8,7 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_( debug || true )
+  : debug_( debug || false )
 {}
 
 /* Get current window size, in datagrams */
@@ -40,8 +40,6 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
   /* Default: take no action */
 
   last_seq_sent = sequence_number;
-
-  /*
   if(after_timeout) {
     
     this->the_window_size = this->the_window_size/2;
@@ -50,7 +48,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
       this->the_window_size = 1;
     }
     this->ack_counter = 0;
-  }*/
+  }
 
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
@@ -69,7 +67,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   /* Default: take no action */
-/*
+
   if(sequence_number_acked > this->last_ack_rcvd) { //Received Future ack
     this->ack_counter += 1;
     if(this->ack_counter >= this->the_window_size) {
@@ -87,19 +85,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     }
     this->ack_counter = 0;
   }
-*/  
-
-  if(timestamp_ack_received - send_timestamp_acked < 150) {
-      if(this->the_window_size < 125) {
-        this->the_window_size += 1;
-      }
-  }
   
-  if(timestamp_ack_received - send_timestamp_acked > 400) {
-      if(this->the_window_size > 30) {
-        this->the_window_size -= 1;
-      }
-  }
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
