@@ -97,12 +97,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
 
   if(rtt >= min_rtt + rtt_delta) {
-    this->the_window_size -= 0.1;
+    this->the_window_size -= 0.5;
   }
 
   if(rtt >= min_rtt + 2*rtt_delta) {
     if (this->the_window_size >= 1) {
-      this->the_window_size -= 0.1;
+      this->the_window_size -= 0.5;
     }
   }
 /*
@@ -126,8 +126,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     if (congestion) {
       congestion = false;
     }
-    if(this->the_window_size < this->last_good_window-5) {
-      this->the_window_size += (this->last_good_window - this->the_window_size)/2;
+    if(this->the_window_size < this->last_good_window-1) {
+      this->the_window_size += (this->last_good_window - this->the_window_size)/4;
     } else {
       this->the_window_size += 0.1;
     }
