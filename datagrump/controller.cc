@@ -126,12 +126,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     if (congestion) {
       congestion = false;
     }
-    this->last_good_window = max(this->the_window_size, this->last_good_window);
-    if(this->the_window_size < this->last_good_window - 10) {
+    if(this->the_window_size < this->last_good_window-5) {
       this->the_window_size += (this->last_good_window - this->the_window_size)/2;
     } else {
       this->the_window_size += 0.1;
     }
+    this->last_good_window = max(this->the_window_size, this->last_good_window);
   } else {
     if (!congestion) this->last_good_window = this->the_window_size;
     congestion = true;
