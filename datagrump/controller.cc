@@ -96,7 +96,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
 
   if(rtt >= min_rtt + rtt_delta) {
-    this->the_window_size -= 0.05;
+    this->the_window_size -= 0.1;
   }
 
   if(rtt >= min_rtt + 2*rtt_delta) {
@@ -106,7 +106,11 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
 
   if(rtt < min_rtt + rtt_delta) {
-    this->the_window_size += 0.3;
+    this->the_window_size += 0.05;
+  }
+  
+  if(rtt < min_rtt + rtt_delta/2) {
+    this->the_window_size += 0.25;
   }
 
   if ( debug_ ) {
@@ -116,6 +120,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 	 << ", received @ time " << recv_timestamp_acked << " by receiver's clock)"
 	 << endl;
   }
+  cerr << "window size:" << this->the_window_size << endl;
 }
 
 /* How long to wait (in milliseconds) if there are no acks
@@ -123,5 +128,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 unsigned int Controller::timeout_ms()
 {
   //return 1000; /* timeout of one second */
-  return 2*min_rtt;
+  return 3*min_rtt;
 }
