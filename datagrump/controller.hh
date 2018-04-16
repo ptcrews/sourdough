@@ -13,6 +13,13 @@ private:
   double estimated_window_size = 30;
   uint64_t last_timeout = 0;
 
+  // Various constants to modify
+  uint64_t seq_timeout_sep = 200;
+  double alpha = 0.2;
+  double dec_scaling = 0.01;
+  double inc_scaling = 0.5;
+  uint32_t timeout_mult = 2;
+
   // Estimate minimal RTT value
   uint64_t min_rtt = 5000;
   uint64_t rtt_delta = 20;

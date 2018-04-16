@@ -10,7 +10,39 @@ using namespace std;
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug || false )
-{ }
+{
+  char* seq_timeout_sep_str = std::getenv("SEQ_TIMEOUT");
+  if (seq_timeout_sep_str) {
+    seq_timeout_sep = strtol(seq_timeout_sep_str, NULL, 10);
+    cout << "Seq Timeout: " << seq_timeout_sep << endl;
+  }
+  char* alpha_str = std::getenv("ALPHA");
+  if (alpha_str) {
+    alpha = strtol(alpha_str, NULL, 10)*0.01;
+    cout << "Alpha: " << alpha << endl;
+  }
+  char* dec_str = std::getenv("DEC");
+  if (dec_str) {
+    dec_scaling = strtol(dec_str, NULL, 10)*0.01;
+    cout << "Dec scaling: " << dec_scaling << endl;
+  }
+  char* inc_str = std::getenv("INC");
+  if (inc_str) {
+    inc_scaling = strtol(inc_str, NULL, 10)*0.1;
+    cout << "Inc scaling: " << inc_scaling << endl;
+  }
+  char* timeout_str = std::getenv("TIMEOUT");
+  if (timeout_str) {
+    timeout_mult = strtol(timeout_str, NULL, 10);
+    cout << "Timeout mult: " << timeout_mult << endl;
+  }
+  char* rtt_delta_str = std::getenv("RTT_DELTA");
+  if (rtt_delta_str) {
+    rtt_delta = strtol(rtt_delta_str, NULL, 10);
+    cout << "RTT Delta: " << rtt_delta << endl;
+  }
+  
+}
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size()
@@ -42,11 +74,11 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 
   last_seq_sent = sequence_number;
 
-  if(after_timeout && (send_timestamp - last_timeout) > 200) {
+  if(after_timeout && (send_timestamp - last_timeout) > seq_timeout_sep) {
 
     last_timeout = send_timestamp;
     this->the_window_size = this->the_window_size/2;
-    cerr << "window size halved: timeout" << endl;
+    //cerr << "window size halved: timeout" << endl;
     if(this->the_window_size == 0) {
       this->the_window_size = 1;
     }
@@ -91,8 +123,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 <<<<<<< Updated upstream
 */  
   const uint64_t rtt = timestamp_ack_received - send_timestamp_acked;
-  cout << "RTT: " << rtt << "MinRTT: " << min_rtt << endl;
-  double alpha = 0.2;
+  //cout << "RTT: " << rtt << "MinRTT: " << min_rtt << endl;
   this->estimated_window_size = alpha * this->the_window_size + (1-alpha)*this->estimated_window_size;
   if(rtt < min_rtt) {
     min_rtt = rtt;
@@ -102,7 +133,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     if (this->the_window_size > this->estimated_window_size) {
         this->the_window_size = this->estimated_window_size;
     } else {
-        double adjustment = (pow(rtt - min_rtt + rtt_delta, 2) / pow(rtt_delta, 2))*0.01;
+        double adjustment = (pow(rtt - min_rtt + rtt_delta, 2) / pow(rtt_delta, 2))*dec_scaling;
 	this->the_window_size -= adjustment;
     }
   }
@@ -125,7 +156,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   // Good window size
   if(rtt < min_rtt + rtt_delta) {
-    double adjustment = (pow((min_rtt + rtt_delta - rtt), 2) / (pow(rtt_delta, 2)))*0.5;
+    double adjustment = (pow((min_rtt + rtt_delta - rtt), 2) / (pow(rtt_delta, 2)))*inc_scaling;
     this->the_window_size = max(this->the_window_size + adjustment, this->estimated_window_size);
   }
 
@@ -141,13 +172,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 	 << ", received @ time " << recv_timestamp_acked << " by receiver's clock)"
 	 << endl;
   }
-  cerr << "window size:" << this->the_window_size << endl;
+  //cerr << "window size:" << this->the_window_size << endl;
 }
 
 /* How long to wait (in milliseconds) if there are no acks
    before sending one more datagram */
 unsigned int Controller::timeout_ms()
 {
-  //return 1000; /* timeout of one second */
-  return 2*min_rtt;
+  return timeout_mult*min_rtt;
 }
