@@ -92,8 +92,7 @@ the possible window size which could result using LOWER\_BOUND and UPPER\_BOUND
 constants. After fiddling with different values for all four of these constants, we
 settled on UPPER\_THRESH = 400ms, LOWER\_THRESH = 150ms, UPPER\_BOUND = 125 packets,
 and LOWER\_BOUND = 30 packets. This resulted in a throughout of 4.73 Mbits/s, a signal
-delay of 518 ms, and a power score of 9.13. These are the constants used in the git branch
-labeled TODO:XXXXXXXXXXXXXX. 
+delay of 518 ms, and a power score of 9.13.
 
 ## Exercise D: The Contest
 
@@ -178,16 +177,16 @@ this optimization runs the highest risk for overtraining our algorithm on
 the dataset, but we believe that this optimization did not substantively
 decrease the performance of our algorithm in general. In total, we optmized
 the following constants:
-- SEQ\_TIMEOUT: This is the separation between sequential timeouts before
+  - SEQ\_TIMEOUT: This is the separation between sequential timeouts before
 reducing the window size again (in ms).
-- Alpha: This is the update coefficient for the exponentially weighted moving
+  - Alpha: This is the update coefficient for the exponentially weighted moving
 average used to estimate the bandwidth.
-- DEC: This is the multiplier for decreasing the size of the window when
+  - DEC: This is the multiplier for decreasing the size of the window when
 we receive a bad RTT.
-- INC: This is the multiplier for increasing the window size when we receive
+  - INC: This is the multiplier for increasing the window size when we receive
 a good RTT.
-- TIMEOUT: This is the size of the timeout (in multiples of RTT).
-- RTT\_Delta: This is the allowed delta around the minRTT that catagorizes
+  - TIMEOUT: This is the size of the timeout (in multiples of RTT).
+  - RTT\_Delta: This is the allowed delta around the minRTT that catagorizes
 a "good" or "bad" RTT.
 
 Figure 3 is the output from one of our experiments, where we varied both the INC
@@ -228,7 +227,6 @@ we seemed to perform about as optimal as possible with our given approach.
 ### Unsuccessful Efforts
 
 - **Time Based Window Size Restoration:**
-
 One idea that we had was to estimate the ideal congestion window to which 
 we should return upon noticing that congestion has fallen. To do so, we
 saved a moving window of past window sizes. Upon receiving an ack with a 
