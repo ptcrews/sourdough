@@ -229,6 +229,19 @@ we seemed to perform about as optimal as possible with our given approach.
 
 - **Time Based Window Size Restoration:**
 
+One idea that we had was to estimate the ideal congestion window to which 
+we should return upon noticing that congestion has fallen. To do so, we
+saved a moving window of past window sizes. Upon receiving an ack with a 
+long RTT, indicating the prescence of significant congestion, we would store
+whatever window size was used for the window previous to the window which resulted
+congestion. Once, in the future, we detected that congestion had dissapeared (by
+detecting an RTT near the minRTT again) we would rapidly ramp up the window size
+by setting it to this saved pre-congestion window size. The idea is that this would
+earn back some of the wasted throughput. Unfortunately, this approach ended up
+harming delay too much to make it worthwhile, as at time we would ramp back up too
+rapidly, as the bandwidth available was not as high as prior to the congestion instance.
+Accordingly, we removed this code from our final implementation.
+
 ## Exercise E: Name
 
 After extensive deliberation, we decided to call our algorithm "TensorFlowRateFairness",
