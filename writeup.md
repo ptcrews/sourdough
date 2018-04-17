@@ -13,6 +13,9 @@ header-includes:
 ## Overview
 
 ## Exercise A: Window Size
+
+**Commit Hash:** addc858857466f569a7751fed125ea55faf2b25b
+
 ![Window Graph](varying_window.png)
 
 For this exercise, we wrote scripts to conduct two different tests. First,
@@ -31,6 +34,7 @@ the variation between measurements is pretty small.
 ![Variance Table](measurement_variance2.jpg)
 
 ## Exercise B: AIMD Scheme
+**Commit Hash:** b6c5d7ab0d889e48a91eab0f4cfa6066459ff597
 
 Our simple AIMD scheme increased the window size by 1 every time a full window
 size of acks was received. Additionally, our scheme halved the window size whenever
@@ -77,7 +81,7 @@ significantly improved latency while keeping throughput reasonable.
 
 ### Additional Improvements
 
-#### Multiple Window Size Adjustments
+- **Multiple Window Size Adjustments:**
 Our next thought in this process was that applying a constant adjustment to the
 window size regardless of how far the measured RTT was from the minRTT + 
 rtt\_delta boundary was not ideal behavior - when near the boundary, less 
@@ -92,7 +96,7 @@ the minRTT, 0.1 for measurements only 1 rtt\_delta greater than the minRTT, and
 decreasing by 0.1 only when measurments were 0.5\*rtt\_delta less than minRTT + 
 rtt\_delta.
 
-#### Quadratic Window Size Adjustments
+- **Quadratic Window Size Adjustments:**
 After looking at the network traces, we noticed that the window size would
 remain small for extended periods of time even though latency had dropped
 back to a reasonable value. We attribute this to the fact that our
@@ -106,20 +110,62 @@ measured RTT, we quickly cut the window size to be either equal to or less
 than the estimated window size. This significantly improved throughput while
 slightly increasing the measured latency.
 
-#### Agressive Timeouts
+- **Agressive Timeouts:**
 Up until this point we were still only triggering timeouts if acks
 were received more than a seconds after they were sent. Given the availability
 of RTT estimates, we changed the timeout length to be any time a packet took
 longer than 2\*minRTT to be acked. This proactive handling of timeouts 
 improved our power score by reducing signal delay due to dropped packets.
 
-#### Selecting Ideal Constants
+- **Optimizing Constants:**
+After adding most of the major functionality to our project, we started to
+focus on improving the power score of our algorithm by optimizing constants.
+Most of these constants are found in controller.hh, and we ran numerous tests
+that changed these values to maximize the power score. The majority of these
+tests were run on a GCE instance to improve reliability, and the final
+constants we selected were based on the output from these tests. Note that
+this optimization runs the highest risk for overtraining our algorithm on
+the dataset, but we believe that this optimization did not substantively
+decrease the performance of our algorithm in general. Below is the output from
+one of our experiments, where we varied both the INC and RTT\_Delta
+parameters (where the INC value is the weight we give each window size
+adjustment, and the RTT\_Delta is the permitted deviance from the true RTT).
+
+![Graph of power scores when varying RTT\_Delta and INC](rtt_delta_and_inc.png)
+
+TODO: Which constants did we optimize here?
 
 ### Overtraining Resistance
+One of our main concerns with our algorithm is overtraining to this specific
+dataset. In particular, our extensive testing to find the best constants for
+various parameters ran the risk of overfitting our algorithm to only be
+performant with this specific network trace. However, we are confident that
+our algorithm will perform well in general for three main reasons:
+
+1. *The selected constants fall within a good range.* Our test suite ran on
+a range of values, all of which gave good performance in general. Our selection
+of constants was well within this range, indicating that we were simply picking
+the best value from a set of good values. We believe that it is unlikely that
+our constant optimization significantly negatively impacts the performance
+of our algorithm on other datasets.
+
+2. *Our assumptions are general.* Although our algorithm makes some assumptions
+about the data, these assumptions are either general enough to not overfit
+this dataset, or also hold for the dataset we will be tested against. For
+instance, we made the assumption that the true RTT of the network link does
+not significantly change over the course of the test. Since we know that the
+dataset we will be tested against has the same propogation delay (20ms,
+according to the TAs on Piazza), we know this assumption does not overfit our
+data to this specific test.
+
+3. *Our performance was not terrible on other traces.* We ran our test suite
+on other network traces, and our performance did not appear to be terrible.
+Although we certainly performed worse in comparison to the provided dataset,
+we seemed to perform about as optimal as possible with our given approach.
 
 ### Unsuccessful Efforts
 
-#### Time Based Window Size Restoration
+- **Time Based Window Size Restoration:**
 
 ### Final Design
 
