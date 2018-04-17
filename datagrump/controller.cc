@@ -53,6 +53,15 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     this->ack_counter = 0;
   }*/
 
+
+/*  if(after_timeout) {
+    this->the_window_size = this->the_window_size * 3/4;
+    if (this->the_window_size < 1) {
+      this->the_window_size = 1;
+    }
+  } */
+
+
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
       << " sent datagram " << sequence_number << " (timeout = " << after_timeout << ")\n";
@@ -91,7 +100,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 <<<<<<< Updated upstream
 */  
   const uint64_t rtt = timestamp_ack_received - send_timestamp_acked;
-  cout << "RTT: " << rtt << "MinRTT: " << min_rtt << endl;
+  //cout << "RTT: " << rtt << "MinRTT: " << min_rtt << endl;
   if(rtt < min_rtt) {
     min_rtt = rtt;
   }
@@ -108,8 +117,20 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 */
 //new method for decreasing window size (dynamic)
 
+  char* dec_const_str = std::getenv("DEC_CONST");
+  double dec_const = 0.0125;
+  if (dec_const_str) {
+    dec_const = atof(dec_const_str);
+  }
+
+  char* inc_const_str = std::getenv("INC_CONST");
+  double inc_const = 0.5;
+  if (inc_const_str) {
+    inc_const = atof(inc_const_str);
+  }
+
   if(rtt >= min_rtt + rtt_delta) {
-    this->the_window_size -= (pow(rtt - min_rtt + rtt_delta, 2)/pow(rtt_delta,2)) * 0.01;
+    this->the_window_size -= (pow(rtt - min_rtt + rtt_delta, 2)/pow(rtt_delta,2)) * dec_const;
   }
 
 /*
@@ -129,7 +150,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
 
   if(rtt < min_rtt + rtt_delta) {
-    this->the_window_size +=  (pow((min_rtt + rtt_delta - rtt), 2) / (pow(rtt_delta, 2))) * 0.5;
+    this->the_window_size +=  (pow((min_rtt + rtt_delta - rtt), 2) / (pow(rtt_delta, 2))) * inc_const;
   }
 
 
@@ -144,7 +165,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 	 << ", received @ time " << recv_timestamp_acked << " by receiver's clock)"
 	 << endl;
   }
-  cerr << "window size:" << this->the_window_size << endl;
+//  cerr << "window size:" << this->the_window_size << endl;
 }
 
 /* How long to wait (in milliseconds) if there are no acks
@@ -152,5 +173,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 unsigned int Controller::timeout_ms()
 {
   //return 1000; /* timeout of one second */
-  return 3*min_rtt;
+  return 2*min_rtt;
 }
