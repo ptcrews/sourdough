@@ -15,6 +15,8 @@ header-includes:
 ## Exercise A: Window Size
 ![Window Graph](varying_window.png)
 
+
+
 ## Exercise B: AIMD Scheme
 
 ## Exercise C: Delay-Triggered Scheme
@@ -32,7 +34,8 @@ on any changes in this RTT. This approach was highly effective, and
 significantly improved latency while keeping throughput reasonable.
 
 ### Additional Improvements
-#### Slow To Restore Window Size
+
+#### Quadratic Window Size Adjustments
 After looking at the network traces, we noticed that the window size would
 remain small for extended periods of time even though latency had dropped
 back to a reasonable value. We attribute this to the fact that our
@@ -49,6 +52,10 @@ slightly increasing the measured latency.
 #### Selecting Ideal Constants
 
 ### Overtraining Resistance
+
+### Unsuccessful Efforts
+
+#### Time Based Window Size Restoration
 
 ### Final Design
 
