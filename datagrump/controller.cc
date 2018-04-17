@@ -77,8 +77,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
   if(after_timeout && (send_timestamp - last_timeout) > seq_timeout_sep) {
 
     last_timeout = send_timestamp;
-    this->the_window_size = this->the_window_size/2;
-    //cerr << "window size halved: timeout" << endl;
+    this->the_window_size = this->the_window_size * 3/4;
     if(this->the_window_size == 0) {
       this->the_window_size = 1;
     }
@@ -101,32 +100,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-  /* Default: take no action */
-/*
-  if(sequence_number_acked > this->last_ack_rcvd) { //Received Future ack
-    this->ack_counter += 1;
-    if(this->ack_counter >= this->the_window_size) {
-      this->ack_counter = 0;
-      this->the_window_size += 1;
-    }
-    this->last_ack_rcvd = sequence_number_acked;
-  }
-
-  else if(sequence_number_acked <= this->last_ack_rcvd){ //Drop detected
-    this->the_window_size = this->the_window_size/2;
-    cerr << "window size halved: old ack" << endl;
-    if(this->the_window_size == 0) {
-      this->the_window_size = 1;
-    }
-    this->ack_counter = 0;
-  }
-<<<<<<< Updated upstream
-*/  
   const uint64_t rtt = timestamp_ack_received - send_timestamp_acked;
   //cout << "RTT: " << rtt << "MinRTT: " << min_rtt << endl;
   this->estimated_window_size = alpha * this->the_window_size + (1-alpha)*this->estimated_window_size;
   if(rtt < min_rtt) {
     min_rtt = rtt;
+    //cout << "MINRTT: " << min_rtt << endl;
   }
 
   if(rtt >= min_rtt + rtt_delta) {
@@ -137,22 +116,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 	this->the_window_size -= adjustment;
     }
   }
-
-/*
-  if(rtt < min_rtt + rtt_delta) {
-    this->the_window_size += 0.01;
-  }
-  
-  if(rtt < min_rtt + rtt_delta/2) {
-    this->the_window_size += 0.2;
-  }
-
-
-  else if(rtt < min_rtt + rtt_delta/4) {
-    this->the_window_size += 0.4;
-  }
-*/
-
 
   // Good window size
   if(rtt < min_rtt + rtt_delta) {
@@ -179,5 +142,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms()
 {
-  return timeout_mult*min_rtt;
+  return 1.5*min_rtt;
 }

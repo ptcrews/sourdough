@@ -14,15 +14,15 @@ private:
   uint64_t last_timeout = 0;
 
   // Various constants to modify
-  uint64_t seq_timeout_sep = 200;
-  double alpha = 0.2;
-  double dec_scaling = 0.01;
-  double inc_scaling = 0.5;
+  uint64_t seq_timeout_sep = 300;
+  double alpha = 0.1;
+  double dec_scaling = 0.013;
+  double inc_scaling = 0.6;
   uint32_t timeout_mult = 2;
 
   // Estimate minimal RTT value
   uint64_t min_rtt = 5000;
-  uint64_t rtt_delta = 20;
+  uint64_t rtt_delta = 18;
 
   unsigned int last_seq_sent = 0;
   unsigned int last_ack_rcvd = 0;
