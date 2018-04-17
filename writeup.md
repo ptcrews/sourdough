@@ -12,7 +12,7 @@ header-includes:
 ## Git Repository
 
 The git repository containing our submission can be found at 
-https://github.com/ptcrews/sourdough.git
+[https://github.com/ptcrews/sourdough.git](https://github.com/ptcrews/sourdough.git)
 
 The commit hash containing code for individual exercises are listed in this
 report in the section describing each exercise. We do not provide a commit
@@ -190,7 +190,7 @@ a good RTT.
 - RTT\_Delta: This is the allowed delta around the minRTT that catagorizes
 a "good" or "bad" RTT.
 
-Below is the output from one of our experiments, where we varied both the INC
+Figure 3 is the output from one of our experiments, where we varied both the INC
 and RTT\_Delta parameters (where the INC value is the weight we give each
 window size adjustment, and the RTT\_Delta is the permitted deviance from the
 true RTT).
