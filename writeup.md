@@ -8,7 +8,23 @@ header-includes:
 ---
 # Programming Assignment 1: Congestion Control Contest
 ## Hudson Ayers, Paul Crews | CS 244
-## Final Statistics: TODO
+
+## Git Repository
+
+The git repository containing our submission can be found at 
+https://github.com/ptcrews/sourdough.git
+
+The commit hash containing code for individual exercises are listed in this
+report in the section describing each exercise. We do not provide a commit
+hash for exercise C because exercise C was removed as a requirement.
+
+## Final Statistics:
+
+Average throughput: 3.94 Mbits/s
+
+95th percentile signal delay: 91 ms
+
+Power Score: 43.30
 
 ## Overview
 
@@ -51,13 +67,13 @@ implementing AIMD with the constants described above resulted in the following
 measurements:
 
 
-Average capacity: 5.04 Mbits/s
-
 Average throughput: 4.85 Mbits/s (96.2% utilization)
 
 95th percentile per-packet queueing delay: 1094 ms
 
 95th percentile signal delay: 1713 ms
+
+Power Score: 2.83
 
 ## Exercise C: Delay-Triggered Scheme
 
@@ -80,6 +96,9 @@ delay of 518 ms, and a power score of 9.13. These are the constants used in the 
 labeled TODO:XXXXXXXXXXXXXX. 
 
 ## Exercise D: The Contest
+
+Our contest submission can be run by calling make, then ./run\_contest, from the
+master branch of our git repository.
 
 ### Initial Approach
 Our initial approach built on the code from Exercise C, while combining some
