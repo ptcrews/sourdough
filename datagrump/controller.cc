@@ -33,7 +33,7 @@ Controller::Controller( const bool debug )
   }
   char* timeout_str = std::getenv("TIMEOUT");
   if (timeout_str) {
-    timeout_mult = strtol(timeout_str, NULL, 10);
+    timeout_mult = strtol(timeout_str, NULL, 10)*0.1;
     cout << "Timeout mult: " << timeout_mult << endl;
   }
   char* rtt_delta_str = std::getenv("RTT_DELTA");
@@ -70,7 +70,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
   if(after_timeout && (send_timestamp - last_timeout) > seq_timeout_sep) {
 
     last_timeout = send_timestamp;
-    this->the_window_size = this->the_window_size * 3/4;
+    this->the_window_size = this->the_window_size * rtx_window_dec;
     if(this->the_window_size == 0) {
       this->the_window_size = 1;
     }
@@ -131,5 +131,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms()
 {
-  return 1.5*min_rtt;
+  return timeout_mult*min_rtt;
 }
