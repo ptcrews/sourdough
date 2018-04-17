@@ -10,10 +10,20 @@ class Controller
 private:
   bool debug_; /* Enables debugging output */
   double the_window_size = 30;
+  double estimated_window_size = 30;
+  uint64_t last_timeout = 0;
 
-  // Estimate minimal RTT value
+  // Various constants to modify
+  uint64_t seq_timeout_sep = 300;
+  double alpha = 0.1;
+  double dec_scaling = 0.0125;
+  double inc_scaling = 0.6;
+  double timeout_mult = 1.5;
+  double rtx_window_dec = 0.75;
+  uint64_t rtt_delta = 18;
+
+  // Estimate initial RTT value
   uint64_t min_rtt = 5000;
-  uint64_t rtt_delta = 22;
 
   unsigned int last_seq_sent = 0;
   unsigned int last_ack_rcvd = 0;
