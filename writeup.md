@@ -8,9 +8,7 @@ header-includes:
 ---
 # Programming Assignment 1: Congestion Control Contest
 ## Hudson Ayers, Paul Crews | CS 244
-
 ## Final Statistics: TODO
----
 
 ## Overview
 
