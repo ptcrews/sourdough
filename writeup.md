@@ -107,6 +107,11 @@ than the estimated window size. This significantly improved throughput while
 slightly increasing the measured latency.
 
 #### Agressive Timeouts
+Up until this point we were still only triggering timeouts if acks
+were received more than a seconds after they were sent. Given the availability
+of RTT estimates, we changed the timeout length to be any time a packet took
+longer than 2\*minRTT to be acked. This proactive handling of timeouts 
+improved our power score by reducing signal delay due to dropped packets.
 
 #### Selecting Ideal Constants
 
