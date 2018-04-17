@@ -15,7 +15,19 @@ header-includes:
 ## Exercise A: Window Size
 ![Window Graph](varying_window.png)
 
+For this exercise, we wrote scripts to conduct two different tests. First,
+we wrote a script that edited the controller.cc file to return different window
+sizes from the window_size() function. This script tested 20 different window sizes
+ranging from 10 packets to 200 packets. The results of our test can be seen in the
+plot above. It is clear from the plot that increasing the window size improves throughput
+at the expense of delay, and that for window sizes above 50 packets there was
+little gain in throughput but significant expense in delay.
 
+Next, we wrote a script that ran the test for a single fixed window
+size of 50 packets 20 times. The averages and standard deviation of each of the
+output measurements can be seen in the table below.
+
+![Variance Table](measurement_variance2.jpg)
 
 ## Exercise B: AIMD Scheme
 
