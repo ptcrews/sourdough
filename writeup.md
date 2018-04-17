@@ -12,6 +12,11 @@ header-includes:
 
 ## Overview
 
+This document presents the work we did to complete each of the exercises
+presented in Programming Assignment 1. The section describing Exercise D
+contains information about our approach and decision making, as well as plots
+detailing many of the different runs we attempted.
+
 ## Exercise A: Window Size
 
 **Commit Hash:** addc858857466f569a7751fed125ea55faf2b25b
@@ -39,8 +44,20 @@ the variation between measurements is pretty small.
 Our simple AIMD scheme increased the window size by 1 every time a full window
 size of acks was received. Additionally, our scheme halved the window size whenever
 a drop was detected via a repeated ACK or a timeout. Our timeout was set as a
-constant of 1 second. This scheme did not work particularly well. 
-TODO: What happened to our AIMD results?? What constants did we settle on??
+constant of 1 second. This scheme did not work particularly well - in fact, it
+was even worse than the best of the fixed window measurments when compared by 
+Power Score. AIMD ensured high throughput but resulted in very large delays. Specifically,
+implementing AIMD with the constants described above resulted in the following 
+measurements:
+
+
+Average capacity: 5.04 Mbits/s
+
+Average throughput: 4.85 Mbits/s (96.2% utilization)
+
+95th percentile per-packet queueing delay: 1094 ms
+
+95th percentile signal delay: 1713 ms
 
 ## Exercise C: Delay-Triggered Scheme
 
@@ -96,7 +113,21 @@ the minRTT, 0.1 for measurements only 1 rtt\_delta greater than the minRTT, and
 decreasing by 0.1 only when measurments were 0.5\*rtt\_delta less than minRTT + 
 rtt\_delta.
 
-- **Quadratic Window Size Adjustments:**
+- **Quadratic Window Size Adjustments**
+After playing with constants as described in the previous section, we decided
+that a better approach would be a system for which the window size adjustment was
+directly tied to how far off the measured RTT is from minRTT + rtt\_delta. Upon
+further reflection, we decided that we wanted this setup so that when the window
+size was near minRTT + rtt\_delta, we wanted to change the window size very little,
+but when far from this point, we wanted to change the window size rapidly. 
+Accordingly, we implemented a quadratic function to adjust the window size based
+off of how far the measured RTT of each ack is from minRTT + rtt\_delta. 
+These quadratic functions were then multiplied by INC\_CONST and DEC\_CONST
+multipliers (for increasing the window size and decreasing the window size, 
+respectively) which we tuned to ensure that the adjustment of window size in either
+direction was neither too fast nor too slow.
+
+- **Improved Estimation of Ideal Window Size**
 After looking at the network traces, we noticed that the window size would
 remain small for extended periods of time even though latency had dropped
 back to a reasonable value. We attribute this to the fact that our
@@ -167,35 +198,10 @@ we seemed to perform about as optimal as possible with our given approach.
 
 - **Time Based Window Size Restoration:**
 
-### Final Design
-
-### Further Work
-
 ## Exercise E: Name
 
+After extensive deliberation, we decided to call our algorithm "TensorFlowRateFairness",
+even though our approach did not use machine learning at all. This is because it makes our
+algorithm appear significantly more intimidating and complex than it is.
 
----
-Warmup exercise A [10%]: Vary the fixed window size by editing controller.cc to
-see what happens. Make a 2D graph of throughput vs. 95-percentile signal delay
-(similar to what is seen on the contest analysis URLs) as you vary this value.
-What is the best single window size that you can find to maximize the overall
-"score" (log throughput/delay)? How repeatable are the measurements taken with
-the same window size over multiple runs?
 
-Warmup exercise B [40%]: Implement a simple AIMD scheme, similar to TCP's
-congestion-avoidance phase. How well does this work? What constants did you
-choose?
-
-Warmup exercise C [20%]: Implement a simple delay-triggered scheme, where the
-window rises or falls based on whether the round-trip-time crosses some
-threshold value. Experiment with a few thresholds or tweaks and report on what
-worked the best.
-
-Exercise D [50%]: the contest. Try different approaches and work to maximize
-your score on the final evaluation. Be wary about "overtraining": after the
-contest is over, we will collect new network traces and then run everybody's
-entries over the newly-collected evaluation trace. In your report, please
-explain your approach, including the important decisions you had to make and
-how you made them.  Include illustrative plots.
-
-Exercise E [0%]: pick a cool name for your scheme!
