@@ -16,7 +16,7 @@ private:
   // Various constants to modify
   uint64_t seq_timeout_sep = 300;
   double alpha = 0.1;
-  double dec_scaling = 0.013;
+  double dec_scaling = 0.0125;
   double inc_scaling = 0.6;
   uint32_t timeout_mult = 2;
 

@@ -47,12 +47,6 @@ Controller::Controller( const bool debug )
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size()
 {
-  /* Default: fixed window size of 100 outstanding datagrams */
-//  char* window_size_str = std::getenv("WINDOW_SIZE");
-//  unsigned int the_window_size = 50;
-//  if (window_size_str) {
-//    the_window_size = strtol(window_size_str, NULL, 10);
-//  }
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
@@ -70,7 +64,6 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 				    const bool after_timeout
 				    /* datagram was sent because of a timeout */ )
 {
-  /* Default: take no action */
 
   last_seq_sent = sequence_number;
 
@@ -81,7 +74,6 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     if(this->the_window_size == 0) {
       this->the_window_size = 1;
     }
-    this->ack_counter = 0;
   }
 
   if ( debug_ ) {
@@ -101,11 +93,9 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   const uint64_t rtt = timestamp_ack_received - send_timestamp_acked;
-  //cout << "RTT: " << rtt << "MinRTT: " << min_rtt << endl;
   this->estimated_window_size = alpha * this->the_window_size + (1-alpha)*this->estimated_window_size;
   if(rtt < min_rtt) {
     min_rtt = rtt;
-    //cout << "MINRTT: " << min_rtt << endl;
   }
 
   if(rtt >= min_rtt + rtt_delta) {
@@ -135,7 +125,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 	 << ", received @ time " << recv_timestamp_acked << " by receiver's clock)"
 	 << endl;
   }
-  //cerr << "window size:" << this->the_window_size << endl;
 }
 
 /* How long to wait (in milliseconds) if there are no acks
