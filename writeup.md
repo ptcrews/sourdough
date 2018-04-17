@@ -176,14 +176,26 @@ tests were run on a GCE instance to improve reliability, and the final
 constants we selected were based on the output from these tests. Note that
 this optimization runs the highest risk for overtraining our algorithm on
 the dataset, but we believe that this optimization did not substantively
-decrease the performance of our algorithm in general. Below is the output from
-one of our experiments, where we varied both the INC and RTT\_Delta
-parameters (where the INC value is the weight we give each window size
-adjustment, and the RTT\_Delta is the permitted deviance from the true RTT).
+decrease the performance of our algorithm in general. In total, we optmized
+the following constants:
+- SEQ\_TIMEOUT: This is the separation between sequential timeouts before
+reducing the window size again (in ms).
+- Alpha: This is the update coefficient for the exponentially weighted moving
+average used to estimate the bandwidth.
+- DEC: This is the multiplier for decreasing the size of the window when
+we receive a bad RTT.
+- INC: This is the multiplier for increasing the window size when we receive
+a good RTT.
+- TIMEOUT: This is the size of the timeout (in multiples of RTT).
+- RTT\_Delta: This is the allowed delta around the minRTT that catagorizes
+a "good" or "bad" RTT.
+
+Below is the output from one of our experiments, where we varied both the INC
+and RTT\_Delta parameters (where the INC value is the weight we give each
+window size adjustment, and the RTT\_Delta is the permitted deviance from the
+true RTT).
 
 ![Graph of power scores when varying RTT\_Delta and INC](rtt_delta_and_inc.png)
-
-TODO: Which constants did we optimize here?
 
 ### Overtraining Resistance
 One of our main concerns with our algorithm is overtraining to this specific
