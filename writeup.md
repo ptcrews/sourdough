@@ -12,7 +12,7 @@ header-includes:
 ## Git Repository
 
 The git repository containing our submission can be found at 
-https://github.com/ptcrews/sourdough.git
+[https://github.com/ptcrews/sourdough.git](https://github.com/ptcrews/sourdough.git)
 
 The commit hash containing code for individual exercises are listed in this
 report in the section describing each exercise. We do not provide a commit
